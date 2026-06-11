@@ -330,7 +330,7 @@ meta = [
     ("\U0001F310", "Domain", "Web3 · Blockchain · DID"),
     ("\U0001F4DC", "Contract", "Solidity ^0.8.0"),
     ("\u26D3", "Network", "Sepolia Testnet (EVM)"),
-    ("\U0001F517", "Storage", "IPFS hash anchoring"),
+    ("\U0001F517", "Hash Field", "Manual mock string (P1)"),
     ("\U0001F510", "Access", "Role-Based (Admin only)"),
 ]
 cw = Inches(3.78)
@@ -490,7 +490,7 @@ for i, line in enumerate(code):
 # right column: explanation of key elements
 ex_x = Inches(8.65)
 labels = [
-    ("struct Certificate", "Bundles studentName, courseName & IPFS hash.", CYAN),
+    ("struct Certificate", "Bundles studentName, courseName & a hash-string field.", CYAN),
     ("mapping(string => …)", "Keyed by Registration Number for O(1) reads.", GREEN),
     ("university = msg.sender", "Deployer is the permanent immutable admin.", PURPLE),
     ("require(... == university)", "Blocks all unauthorized writes at EVM level.", RED),
@@ -658,7 +658,7 @@ run(p, "  .success", 11, DARKGREY, font=MONO)
 p = tf.add_paragraph(); p.space_before = Pt(6)
 run(p, "\u2713 Certificate Verified", 16, WHITE, bold=True, font=SANS)
 p = tf.add_paragraph(); p.space_before = Pt(4)
-run(p, "Name · Course · IPFS hash", 12, GREY, font=SANS)
+run(p, "Name · Course · hash-string field", 12, GREY, font=SANS)
 
 # error state
 err = card(s, rx, Inches(4.25), Inches(4.55), Inches(2.05), RED)
@@ -688,7 +688,7 @@ stack = [
     ("Blockchain", "Ethereum / Sepolia Testnet (EVM)", BLUE),
     ("Web3 Library", "Ethers.js", PURPLE),
     ("Wallet / Signer", "MetaMask", AMBER),
-    ("Off-chain Storage", "IPFS (hash anchored on-chain)", GREEN),
+    ("Data Fingerprint", "Manual mock string (IPFS/SHA-256 in P2)", GREEN),
     ("Frontend", "HTML · CSS · JavaScript", RED),
 ]
 yy = Inches(2.5)
