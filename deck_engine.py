@@ -134,13 +134,22 @@ class PptxCanvas:
         return conn
 
     def text(self, x, y, w, h, s, size=12, color="#16213E", align="l",
-             valign="t", bold=False, italic=False, font="Calibri", wrap=True):
+             valign="t", bold=False, italic=False, font="Arial", wrap=True):
         from pptx.util import Pt
-        from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+        from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
+        # Map the measurement font (Helvetica/Courier) to a real PowerPoint font
+        # whose metrics match what _wrap() used, so line breaks + centering are
+        # identical to the PDF QA copy.
+        if str(font).lower().startswith("courier"):
+            ppt_font = "Courier New"
+        else:
+            ppt_font = "Arial"
         tb = self.slide.shapes.add_textbox(self._E(x), self._E(y),
                                            self._E(w), self._E(h))
         tf = tb.text_frame
         tf.word_wrap = wrap
+        # never let PowerPoint resize the text or the box
+        tf.auto_size = MSO_AUTO_SIZE.NONE
         tf.margin_left = 0
         tf.margin_right = 0
         tf.margin_top = 0
@@ -151,7 +160,8 @@ class PptxCanvas:
         for i, ln in enumerate(s.split("\n")):
             p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
             p.alignment = al
-            p.line_spacing = 1.0
+            # absolute leading that matches the PDF backend (size * 1.25)
+            p.line_spacing = Pt(size * 1.25)
             p.space_before = Pt(0)
             p.space_after = Pt(0)
             r = p.add_run()
@@ -159,7 +169,7 @@ class PptxCanvas:
             r.font.size = Pt(size)
             r.font.bold = bold
             r.font.italic = italic
-            r.font.name = font
+            r.font.name = ppt_font
             r.font.color.rgb = self._rgb(color)
         return tb
 
@@ -254,13 +264,22 @@ class PdfCanvas:
 
     def text(self, x, y, w, h, s, size=12, color="#16213E", align="l",
              valign="t", bold=False, italic=False, font="Helvetica", wrap=True):
-        fname = "Helvetica"
-        if bold and italic:
-            fname = "Helvetica-BoldOblique"
-        elif bold:
-            fname = "Helvetica-Bold"
-        elif italic:
-            fname = "Helvetica-Oblique"
+        if str(font).lower().startswith("courier"):
+            fname = "Courier"
+            if bold and italic:
+                fname = "Courier-BoldOblique"
+            elif bold:
+                fname = "Courier-Bold"
+            elif italic:
+                fname = "Courier-Oblique"
+        else:
+            fname = "Helvetica"
+            if bold and italic:
+                fname = "Helvetica-BoldOblique"
+            elif bold:
+                fname = "Helvetica-Bold"
+            elif italic:
+                fname = "Helvetica-Oblique"
         self.c.setFillColor(self._col(color))
         self.c.setFont(fname, size)
         lines = s.split("\n")
